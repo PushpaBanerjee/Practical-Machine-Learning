@@ -1,8 +1,6 @@
-#Practical Machine Learning - Prediction Assignment Writeup
-To do this I made use of caret and randomForest, this allowed me to generate correct answers for each of the 
-20 test data cases provided in this assignment. I made use of a seed value for consistent results.
- 
- 
+Practical Machine Learning - Prediction Assignment Writeup
+For this assignment I analyzed the provided data to determine what activity an individual perform. To do this I made use of caret and randomForest, this allowed me to generate correct answers for each of the 20 test data cases provided in this assignment. I made use of a seed value for consistent results.
+
 library(Hmisc)
 library(caret)
 library(randomForest)
@@ -11,7 +9,7 @@ library(doParallel)
 set.seed(2048)
 options(warn=-1)
 
-First, I loaded the data both from the provided training and test data provided by COURSERA. Some values contained a "#DIV# # /0!" that I replaced with an NA value.
+First, I loaded the data both from the provided training and test data provided by COURSERA. Some values contained a "#DIV/0!" that I replaced with an NA value.
 
 training_data <- read.csv("pml-training.csv", na.strings=c("#DIV/0!") )
 evaluation_data <- read.csv("pml-testing.csv", na.strings=c("#DIV/0!") )
@@ -21,8 +19,7 @@ I also casted all columns 8 to the end to be numeric.
 for(i in c(8:ncol(training_data)-1)) {training_data[,i] = as.numeric(as.character(training_data[,i]))}
 for(i in c(8:ncol(evaluation_data)-1)) {evaluation_data[,i] = as.numeric(as.character(evaluation_data[,i]))}
 
-
-Some columns were mostly blank. These did not contribute well to the prediction. I chose a feature set that only included #complete columns. We also remove user name, timestamps and windows.
+Some columns were mostly blank. These did not contribute well to the prediction. I chose a feature set that only included complete columns. We also remove user name, timestamps and windows.
 
 Determine and display out feature set.
 
@@ -35,8 +32,7 @@ We now have the model data built from our feature set.
 idx <- createDataPartition(y=model_data$classe, p=0.75, list=FALSE )
 training <- model_data[idx,]
 testing <- model_data[-idx,]
-
-We now build 5 random forests with 150 trees each. We make use of parallel processing to build this model. I found several #examples of how to perform parallel processing with random forests in R, this provided a great speedup.
+We now build 5 random forests with 150 trees each. We make use of parallel processing to build this model. I found several examples of how to perform parallel processing with random forests in R, this provided a great speedup.
 
 registerDoParallel()
 x <- training[-ncol(training)]
@@ -54,10 +50,10 @@ confusionMatrix(predictions1,training$classe)
 
 predictions2 <- predict(rf, newdata=testing)
 confusionMatrix(predictions2,testing$classe)
-
 Conclusions and Test Data Submit
 
-As can be seen from the confusion matrix this model is very accurate. I did experiment with PCA and other models, but did #not get as good of accuracy. Because my test data was around 99% accurate I expected nearly all of the submitted test cases #to be correct. It turned out they were all correct.
+As can be seen from the confusion matrix this model is very accurate. I did experiment with PCA and other models, but did not get as good of accuracy. Because my test data was around 99% accurate I expected nearly all of the submitted test cases to be correct. It turned out they were all correct.
+
 Prepare the submission. (using COURSERA provided code)
 
 pml_write_files = function(x){
@@ -76,4 +72,3 @@ answers <- predict(rf, newdata=x)
 answers
 
 pml_write_files(answers)
-
